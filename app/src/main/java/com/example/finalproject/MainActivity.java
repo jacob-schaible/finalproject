@@ -5,7 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -98,6 +102,11 @@ public class MainActivity extends AppCompatActivity {
 
             greetingText.setText(String.format(Locale.US, "%s, %s!",
                     getString(R.string.greeting_text), account.getDisplayName()));
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                startActivity(new Intent(getApplicationContext(), DisplayPeopleActivity.class));
+                finish();
+            }, 1000);
         }
     }
 }
