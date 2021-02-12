@@ -24,7 +24,6 @@ import com.google.android.gms.tasks.Task;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-
     private static final String TAG = "MainActivity";
     private static final int RC_SIGN_IN = 9001;
 
