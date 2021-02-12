@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalProject">
+        <activity android:name=".UserDetailActivity"></activity>
         <activity android:name=".DisplayPeopleActivity" />
         <activity
             android:name=".MainActivity"

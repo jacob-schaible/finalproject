@@ -13,8 +13,8 @@ import com.example.finalproject.model.User;
 import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
-
     private static final String TAG = "UserAdapter";
+    private static ClickListener clickListener;
 
     private List<User> localDataSet;
 
@@ -22,19 +22,21 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
      */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final TextView rowTextView;
 
         public ViewHolder(View view) {
             super(view);
-            view.setOnClickListener(v -> {
-                Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
-
-            });
+            view.setOnClickListener(this);
             rowTextView = (TextView) view.findViewById(R.id.row_text_view);
         }
 
         public TextView getRowTextView() { return rowTextView; }
+
+        @Override
+        public void onClick(View view) {
+            clickListener.onItemClick(getAdapterPosition(), view);
+        }
     }
 
     /**
@@ -68,5 +70,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return localDataSet.size();
+    }
+
+    public static void setOnItemClickListener(ClickListener clickListener) {
+        UserAdapter.clickListener = clickListener;
+    }
+
+    public interface ClickListener {
+        void onItemClick(int position, View view);
     }
 }

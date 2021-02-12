@@ -8,6 +8,22 @@
     <string name="user_detail_fragment_label">Details</string>
     <string name="menu_item_sign_out">Sign out</string>
 
+    <string name="name_placeholder">John Doe</string>
+    <string name="username_placeholder">johndoe86</string>
+    <string name="email_placeholder">johndoe@example.com</string>
+    <string name="phone_placeholder">123-456-7890</string>
+    <string name="address_placeholder">123 Fake St
+        Anytown, USA</string>
+    <string name="website_placeholder">www.jondoe.com</string>
+    <string name="company_placeholder">ACME Inc.</string>
+    <string name="username_label">Username</string>
+    <string name="email_label">Email Address</string>
+    <string name="phone_label">Phone Number</string>
+    <string name="address_label">Address</string>
+    <string name="website_label">Website</string>
+    <string name="company_label">Company</string>
+    <string name="avatar_description">This user\'s profile image</string>
+
     <string name="server_client_id">464108322552-6lbnssc2138p2q5nd9lc8c6h908guiml.apps.googleusercontent.com</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

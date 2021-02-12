@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 startActivity(new Intent(getApplicationContext(), DisplayPeopleActivity.class));
                 finish();
-            }, 1000);
+            }, 2000);
         }
     }
 }

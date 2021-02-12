@@ -1,11 +1,15 @@
 package com.example.finalproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.finalproject.model.User;
 import com.google.gson.Gson;
@@ -26,23 +30,20 @@ import okhttp3.Response;
 
 public class DisplayPeopleActivity extends AppCompatActivity {
     private final String TAG = "DisplayPeopleActivity";
-    private final String USERS = "users";
 
+    private List<User> users;
     private OkHttpClient client;
-    private ArrayList<User> users;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_people);
-
+        recyclerView = findViewById(R.id.user_recycler);
+        users = new ArrayList<>();
         client = new OkHttpClient();
+        Log.d(TAG, "Calling web service");
         getWebService(getString(R.string.user_data_url));
-
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(USERS, users);
-        PeopleListFragment peopleListFragment = new PeopleListFragment();
-        peopleListFragment.setArguments(bundle);
     }
 
     @Override
@@ -77,8 +78,12 @@ public class DisplayPeopleActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try {
+                            Log.d(TAG, "Got response from web service");
                             populateData(response.body().string());
-                        } catch (IOException e) {
+                        } catch(
+                                IOException e)
+
+                        {
                             Log.e(TAG, e.getMessage());
                         }
                     }
@@ -90,16 +95,41 @@ public class DisplayPeopleActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.w(TAG, "Could not retrieve data from web service");
+                        Log.e(TAG, "Could not connect to web service");
                     }
                 });
+
             }
         });
     }
 
     private void populateData(String data) {
-        Gson gson = new Gson();
-        users = new ArrayList<>(Arrays.asList(gson.fromJson(data, User[].class)));
-        Collections.sort(users);
+        if (data != null) {
+            Gson gson = new Gson();
+            users = Arrays.asList(gson.fromJson(data, User[].class));
+            Log.d(TAG, "Populating with " + users.size() + " users");
+
+            UserAdapter.setOnItemClickListener(getOnClickListener());
+            recyclerView.setAdapter(new UserAdapter(users));
+            recyclerView.setLayoutManager(new LinearLayoutManager(this.getApplicationContext()));
+        } else {
+            Log.d(TAG, "No data to populate");
+        }
+    }
+
+    private UserAdapter.ClickListener getOnClickListener() {
+        return new UserAdapter.ClickListener() {
+            @Override
+            public void onItemClick(int position, View view) {
+                User user = users.get(position);
+                Log.d(TAG, "Clicked " + user);
+
+                Intent userDetailIntent = new Intent(getApplicationContext(), UserDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("user", user);
+                userDetailIntent.putExtras(bundle);
+                startActivity(userDetailIntent);
+            }
+        };
     }
 }
