@@ -14,17 +14,30 @@
     <string name="username_hint">Enter a username</string>
     <string name="email_hint">Enter an email address</string>
     <string name="phone_hint">Enter a phone number</string>
-    <string name="address_hint">Enter a postal address</string>
+    <string name="street_hint">Enter a street address</string>
+    <string name="suite_hint">Enter a suite #</string>
+    <string name="city_hint">Enter a city</string>
+    <string name="zipcode_hint">Enter a zipcode</string>
     <string name="website_hint">Enter a website address</string>
     <string name="company_hint">Enter a company name</string>
 
     <string name="username_label">Username</string>
     <string name="email_label">Email Address</string>
     <string name="phone_label">Phone Number</string>
-    <string name="address_label">Address</string>
+    <string name="street_label">Street address</string>
+    <string name="suite_label">Suite #</string>
+    <string name="city_label">City</string>
+    <string name="zipcode_label">Zipcode</string>
     <string name="website_label">Website</string>
     <string name="company_label">Company</string>
 
+    <string name="save_dialog_title">Changes detected</string>
+    <string name="save_dialog_prompt">Do you want to save your changes?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="notification_message">Don\'t forget about me!</string>
 
     <string name="server_client_id">464108322552-6lbnssc2138p2q5nd9lc8c6h908guiml.apps.googleusercontent.com</string>
 

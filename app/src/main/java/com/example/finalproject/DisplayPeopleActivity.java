@@ -26,7 +26,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -38,7 +37,7 @@ public class DisplayPeopleActivity extends AppCompatActivity {
     private final String TAG = "DisplayPeopleActivity";
 
     private User currentUser;
-    private List<User> users;
+    private ArrayList<User> users;
     private OkHttpClient client;
     private RecyclerView recyclerView;
 
@@ -48,12 +47,22 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_display_people);
         recyclerView = findViewById(R.id.user_recycler);
 
-        currentUser = getCurrentUser();
-        users = new ArrayList<>();
+        Bundle bundle = getIntent().getExtras();
+        try {
+            users = bundle.getParcelableArrayList("users");
+        } catch (NullPointerException e) {
+            users = new ArrayList<>();
+        }
 
+        currentUser = getCurrentUser();
         client = new OkHttpClient();
-        Log.d(TAG, "Calling web service");
-        getWebService(getString(R.string.user_data_url));
+
+        if (users.isEmpty()) {
+            Log.d(TAG, "Calling web service");
+            getWebService(getString(R.string.user_data_url));
+        } else {
+            populateRecycler();
+        }
     }
 
     @Override
@@ -117,7 +126,8 @@ public class DisplayPeopleActivity extends AppCompatActivity {
                     public void run() {
                         try {
                             Log.d(TAG, "Got response from web service");
-                            populateData(response.body().string());
+                            parseData(response.body().string());
+                            populateRecycler();
                         } catch(IOException e) {
                             Log.e(TAG, e.getMessage());
                         }
@@ -137,7 +147,7 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         });
     }
 
-    private void populateData(String data) {
+    private void parseData(String data) {
         if (data != null) {
             Gson gson = new Gson();
             User[] array = gson.fromJson(data, User[].class);
@@ -148,14 +158,18 @@ public class DisplayPeopleActivity extends AppCompatActivity {
                     u.setAvatarUrl(generateUrl());
             }
             Collections.sort(users);
-            Log.d(TAG, "Populating with " + users.size() + " users");
+            Log.d(TAG, "Parsing " + users.size() + " users");
 
-            UserAdapter.setOnItemClickListener(getOnClickListener());
-            recyclerView.setAdapter(new UserAdapter(users));
-            recyclerView.setLayoutManager(new LinearLayoutManager(this.getApplicationContext()));
         } else {
-            Log.d(TAG, "No data to populate");
+            Log.d(TAG, "No data to parse");
         }
+    }
+
+    private void populateRecycler() {
+        Log.d(TAG, "Populating recycler view");
+        UserAdapter.setOnItemClickListener(getOnClickListener());
+        recyclerView.setAdapter(new UserAdapter(users));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this.getApplicationContext()));
     }
 
     private String generateUrl() {
@@ -179,6 +193,7 @@ public class DisplayPeopleActivity extends AppCompatActivity {
                 Intent userDetailIntent = new Intent(getApplicationContext(), UserDetailActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("user", user);
+                bundle.putParcelableArrayList("users", users);
                 userDetailIntent.putExtras(bundle);
                 startActivity(userDetailIntent);
             }

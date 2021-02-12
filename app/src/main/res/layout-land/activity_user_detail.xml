@@ -116,31 +116,119 @@
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/address_row"
+                            android:id="@+id/street_row"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/address_label"
+                                android:id="@+id/street_label"
                                 android:layout_width="80dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:labelFor="@id/address_field"
-                                android:text="@string/address_label"
+                                android:labelFor="@id/street_field"
+                                android:text="@string/street_label"
                                 android:textSize="18sp" />
 
                             <EditText
-                                android:id="@+id/address_field"
+                                android:id="@+id/street_field"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:ems="10"
                                 android:gravity="start|top"
-                                android:hint="@string/address_hint"
+                                android:hint="@string/street_hint"
                                 android:importantForAutofill="no"
                                 android:inputType="textMultiLine"
                                 android:singleLine="true" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/suite_row"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/suite_label"
+                                android:layout_width="80dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:labelFor="@id/suite_field"
+                                android:text="@string/suite_label"
+                                android:textSize="18sp" />
+
+                            <EditText
+                                android:id="@+id/suite_field"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:ems="10"
+                                android:gravity="start|top"
+                                android:hint="@string/suite_hint"
+                                android:importantForAutofill="no"
+                                android:inputType="textMultiLine"
+                                android:singleLine="true" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/city_row"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/city_label"
+                                android:layout_width="80dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:labelFor="@id/city_field"
+                                android:text="@string/city_label"
+                                android:textSize="18sp" />
+
+                            <EditText
+                                android:id="@+id/city_field"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:ems="10"
+                                android:gravity="start|top"
+                                android:hint="@string/city_hint"
+                                android:importantForAutofill="no"
+                                android:inputType="textMultiLine"
+                                android:singleLine="true" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/zipcode_row"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/zipcode_label"
+                                android:layout_width="80dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:labelFor="@id/zipcode_field"
+                                android:text="@string/zipcode_label"
+                                android:textSize="18sp" />
+
+                            <EditText
+                                android:id="@+id/zipcode_field"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:ems="10"
+                                android:gravity="start|top"
+                                android:hint="@string/zipcode_hint"
+                                android:importantForAutofill="no"
+                                android:inputType="textMultiLine"
+                                android:singleLine="true" />
+
                         </LinearLayout>
 
                         <LinearLayout
