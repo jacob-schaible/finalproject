@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.finalproject.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.gson.Gson;
@@ -36,6 +37,7 @@ import okhttp3.Response;
 public class DisplayPeopleActivity extends AppCompatActivity {
     private final String TAG = "DisplayPeopleActivity";
 
+    private User currentUser;
     private List<User> users;
     private OkHttpClient client;
     private RecyclerView recyclerView;
@@ -45,7 +47,10 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_people);
         recyclerView = findViewById(R.id.user_recycler);
+
+        currentUser = getCurrentUser();
         users = new ArrayList<>();
+
         client = new OkHttpClient();
         Log.d(TAG, "Calling web service");
         getWebService(getString(R.string.user_data_url));
@@ -73,6 +78,18 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private User getCurrentUser() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        User user = User.EMPTY();
+        if (account != null) {
+            user.setName(account.getDisplayName());
+            user.setEmail(account.getEmail());
+            if (account.getPhotoUrl() != null)
+                user.setAvatarUrl(account.getPhotoUrl().toString());
+        }
+        return user;
     }
 
     private void signOut() {
@@ -123,7 +140,9 @@ public class DisplayPeopleActivity extends AppCompatActivity {
     private void populateData(String data) {
         if (data != null) {
             Gson gson = new Gson();
-            users = Arrays.asList(gson.fromJson(data, User[].class));
+            User[] array = gson.fromJson(data, User[].class);
+            users = new ArrayList<>(Arrays.asList(array));
+            users.add(currentUser);
             for (User u : users) {
                 if (u.getAvatarUrl() == null || u.getAvatarUrl().isEmpty())
                     u.setAvatarUrl(generateUrl());
