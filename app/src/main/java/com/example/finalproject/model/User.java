@@ -15,11 +15,13 @@ public class User implements Comparable<User>, Parcelable {
     private String phone;
     private String website;
     private Company company;
+    private String avatarUrl;
 
     public User() {
     }
 
-    public User(int id, String name, String username, String email, Address address, String phone, String website, Company company) {
+    public User(int id, String name, String username, String email, Address address,
+                String phone, String website, Company company, String avatarUrl) {
         this.id = id;
         this.name = name;
         this.username = username;
@@ -28,17 +30,7 @@ public class User implements Comparable<User>, Parcelable {
         this.phone = phone;
         this.website = website;
         this.company = company;
-    }
-
-    protected User(Parcel in) {
-        id = in.readInt();
-        name = in.readString();
-        username = in.readString();
-        email = in.readString();
-        address = in.readParcelable(Address.class.getClassLoader());
-        phone = in.readString();
-        website = in.readString();
-        company = in.readParcelable(Company.class.getClassLoader());
+        this.avatarUrl = avatarUrl;
     }
 
     public int getId() {
@@ -105,6 +97,14 @@ public class User implements Comparable<User>, Parcelable {
         this.company = company;
     }
 
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
     @Override
     public int compareTo(User u) {
         return name.equals(u.getName()) ? Integer.compare(id, u.getId()) : name.compareTo(u.getName());
@@ -130,189 +130,30 @@ public class User implements Comparable<User>, Parcelable {
         dest.writeString(phone);
         dest.writeString(website);
         dest.writeParcelable(company, 3);
+        dest.writeString(avatarUrl);
     }
 
-    public class Address implements Parcelable {
-        private String street;
-        private String suite;
-        private String city;
-        private String zipcode;
-        private Geo geo;
-
-        public Address() {
-        }
-
-        public Address(String street, String suite, String city, String zipcode, Geo geo) {
-            this.street = street;
-            this.suite = suite;
-            this.city = city;
-            this.zipcode = zipcode;
-            this.geo = geo;
-        }
-
-        protected Address(Parcel in) {
-            street = in.readString();
-            suite = in.readString();
-            city = in.readString();
-            zipcode = in.readString();
-            geo = in.readParcelable(Geo.class.getClassLoader());
-        }
-
-        public String getStreet() {
-            return street;
-        }
-
-        public void setStreet(String street) {
-            this.street = street;
-        }
-
-        public String getSuite() {
-            return suite;
-        }
-
-        public void setSuite(String suite) {
-            this.suite = suite;
-        }
-
-        public String getCity() {
-            return city;
-        }
-
-        public void setCity(String city) {
-            this.city = city;
-        }
-
-        public String getZipcode() {
-            return zipcode;
-        }
-
-        public void setZipcode(String zipcode) {
-            this.zipcode = zipcode;
-        }
-
-        public Geo getGeo() {
-            return geo;
-        }
-
-        public void setGeo(Geo geo) {
-            this.geo = geo;
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(street);
-            dest.writeString(suite);
-            dest.writeString(city);
-            dest.writeString(zipcode);
-            dest.writeParcelable(geo, 2);
-        }
-
-        public class Geo implements Parcelable {
-            private String lat;
-            private String lng;
-
-            public Geo() {
-            }
-
-            public Geo(String lat, String lng) {
-                this.lat = lat;
-                this.lng = lng;
-            }
-
-            protected Geo(Parcel in) {
-                lat = in.readString();
-                lng = in.readString();
-            }
-
-            public String getLat() {
-                return lat;
-            }
-
-            public void setLat(String lat) {
-                this.lat = lat;
-            }
-
-            public String getLng() {
-                return lng;
-            }
-
-            public void setLng(String lng) {
-                this.lng = lng;
-            }
-
-            @Override
-            public int describeContents() {
-                return 0;
-            }
-
-            @Override
-            public void writeToParcel(Parcel dest, int flags) {
-                dest.writeString(lat);
-                dest.writeString(lng);
-            }
-        }
+    protected User(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        username = in.readString();
+        email = in.readString();
+        address = in.readParcelable(Address.class.getClassLoader());
+        phone = in.readString();
+        website = in.readString();
+        company = in.readParcelable(Company.class.getClassLoader());
+        avatarUrl = in.readString();
     }
 
-    public class Company implements Parcelable {
-        private String name;
-        private String catchPhrase;
-        private String bs;
-
-        public Company() {
-        }
-
-        public Company(String name, String catchPhrase, String bs) {
-            this.name = name;
-            this.catchPhrase = catchPhrase;
-            this.bs = bs;
-        }
-
-        protected Company(Parcel in) {
-            name = in.readString();
-            catchPhrase = in.readString();
-            bs = in.readString();
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getCatchPhrase() {
-            return catchPhrase;
-        }
-
-        public void setCatchPhrase(String catchPhrase) {
-            this.catchPhrase = catchPhrase;
-        }
-
-        public String getBs() {
-            return bs;
-        }
-
-        public void setBs(String bs) {
-            this.bs = bs;
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
         }
 
         @Override
-        public int describeContents() {
-            return 0;
+        public User[] newArray(int size) {
+            return new User[size];
         }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(name);
-            dest.writeString(catchPhrase);
-            dest.writeString(bs);
-        }
-    }
-
+    };
 }
