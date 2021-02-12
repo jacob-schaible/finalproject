@@ -10,13 +10,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.finalproject.model.User;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -62,10 +67,26 @@ public class DisplayPeopleActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_sign_out) {
+            Log.d(TAG, "Sign out clicked");
+            signOut();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void signOut() {
+        Toast toast = Toast.makeText(getApplicationContext(), "Signing you out", Toast.LENGTH_LONG);
+        toast.show();
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
+        googleSignInClient.signOut();
+
+        Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(mainIntent);
     }
 
     private void getWebService(String url) {
@@ -80,10 +101,7 @@ public class DisplayPeopleActivity extends AppCompatActivity {
                         try {
                             Log.d(TAG, "Got response from web service");
                             populateData(response.body().string());
-                        } catch(
-                                IOException e)
-
-                        {
+                        } catch(IOException e) {
                             Log.e(TAG, e.getMessage());
                         }
                     }
@@ -98,7 +116,6 @@ public class DisplayPeopleActivity extends AppCompatActivity {
                         Log.e(TAG, "Could not connect to web service");
                     }
                 });
-
             }
         });
     }
@@ -107,6 +124,11 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         if (data != null) {
             Gson gson = new Gson();
             users = Arrays.asList(gson.fromJson(data, User[].class));
+            for (User u : users) {
+                if (u.getAvatarUrl() == null || u.getAvatarUrl().isEmpty())
+                    u.setAvatarUrl(generateUrl());
+            }
+            Collections.sort(users);
             Log.d(TAG, "Populating with " + users.size() + " users");
 
             UserAdapter.setOnItemClickListener(getOnClickListener());
@@ -115,6 +137,17 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "No data to populate");
         }
+    }
+
+    private String generateUrl() {
+        final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        SecureRandom rnd = new SecureRandom();
+        int len = rnd.nextInt(10) + 1;
+        StringBuilder sb = new StringBuilder(len);
+        sb.append("https://robohash.org/");
+        for(int i = 0; i < len; i++)
+            sb.append(AB.charAt(rnd.nextInt(AB.length())));
+        return sb.toString();
     }
 
     private UserAdapter.ClickListener getOnClickListener() {

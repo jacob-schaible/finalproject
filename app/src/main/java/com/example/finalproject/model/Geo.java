@@ -32,6 +32,11 @@ public class Geo implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return "@" + lat + ", " + lng;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -58,4 +63,10 @@ public class Geo implements Parcelable {
             return new Geo[size];
         }
     };
+
+    public static Geo DEFAULT() {
+        return new Geo("47.6179615", "-122.3491739");
+    }
+
+    public static Geo EMPTY() { return new Geo("", ""); }
 }

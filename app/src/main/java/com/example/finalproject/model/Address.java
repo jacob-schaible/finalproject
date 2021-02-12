@@ -62,6 +62,11 @@ public class Address implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return street + " " + suite + "\n" + city + " " + zipcode;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -94,4 +99,12 @@ public class Address implements Parcelable {
             return new Address[size];
         }
     };
+
+    public static Address DEFAULT() {
+        return new Address("400 Broad St", "", "Seattle, WA", "98109", Geo.DEFAULT());
+    }
+
+    public static Address EMPTY() {
+        return new Address("", "", "", "", Geo.EMPTY());
+    }
 }

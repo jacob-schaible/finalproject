@@ -21,6 +21,19 @@ public class User implements Comparable<User>, Parcelable {
     }
 
     public User(int id, String name, String username, String email, Address address,
+                String phone, String website, Company company) {
+        this.id = id;
+        this.name = name;
+        this.username = username;
+        this.email = email;
+        this.address = address;
+        this.phone = phone;
+        this.website = website;
+        this.company = company;
+        // No avatar url
+    }
+
+    public User(int id, String name, String username, String email, Address address,
                 String phone, String website, Company company, String avatarUrl) {
         this.id = id;
         this.name = name;
@@ -156,4 +169,14 @@ public class User implements Comparable<User>, Parcelable {
             return new User[size];
         }
     };
+
+    public static User DEFAULT() {
+        return new User(1, "Jen Brown", "jbrown90", "jen@groupr.com",
+                Address.DEFAULT(), "456-789-0123", "https://www.groupr.com",
+                Company.DEFAULT(), "https://robohash.org/jen");
+    }
+
+    public static User EMPTY() {
+        return new User(0, "", "", "", Address.EMPTY(), "", "", Company.EMPTY(), "");
+    }
 }

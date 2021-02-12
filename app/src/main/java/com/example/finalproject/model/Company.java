@@ -42,6 +42,11 @@ public class Company implements Parcelable {
     }
 
     @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -70,4 +75,10 @@ public class Company implements Parcelable {
             return new Company[size];
         }
     };
+
+    public static Company DEFAULT() {
+        return new Company("Seattle Space Needle", "clearly awe-inspiring", "The Space Needle is safely open with limited capacity and industry-leading Elevating Clean standards.");
+    }
+
+    public static Company EMPTY() { return new Company("", "", ""); }
 }
