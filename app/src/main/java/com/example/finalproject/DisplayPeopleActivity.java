@@ -1,10 +1,13 @@
 package com.example.finalproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -35,34 +38,47 @@ import okhttp3.Response;
 
 public class DisplayPeopleActivity extends AppCompatActivity {
     private final String TAG = "DisplayPeopleActivity";
+    private static final String USER = "user";
+    private static final String USERS = "users";
 
+    private SharedPreferences sharedPref;
     private User currentUser;
     private ArrayList<User> users;
     private OkHttpClient client;
     private RecyclerView recyclerView;
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        writeSharedPref();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Gson gson = new Gson();
+        String usersJson = sharedPref.getString(USERS, "");
+        if (!usersJson.isEmpty()) {
+            User[] array = gson.fromJson(usersJson, User[].class);
+            users = new ArrayList<>(Arrays.asList(array));
+        } else {
+            users = new ArrayList<>();
+        }
+        loadData();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_people);
-        recyclerView = findViewById(R.id.user_recycler);
-
-        Bundle bundle = getIntent().getExtras();
-        try {
-            users = bundle.getParcelableArrayList("users");
-        } catch (NullPointerException e) {
-            users = new ArrayList<>();
-        }
 
         currentUser = getCurrentUser();
-        client = new OkHttpClient();
+        recyclerView = findViewById(R.id.user_recycler);
+        sharedPref = getApplicationContext().getSharedPreferences("FinalProject", Context.MODE_PRIVATE);
 
-        if (users.isEmpty()) {
-            Log.d(TAG, "Calling web service");
-            getWebService(getString(R.string.user_data_url));
-        } else {
-            populateRecycler();
-        }
+        // Bundle bundle = getIntent().getExtras();
+        // unpackBundle(bundle);
+        // loadData();
     }
 
     @Override
@@ -89,10 +105,24 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void unpackBundle(Bundle bundle) {
+        if (bundle != null){
+            users = bundle.getParcelableArrayList(USERS);
+        }
+        if (users == null)
+            users = new ArrayList<>();
+    }
+
+    /**
+     * Generates a User object from GoogleSignInAccount
+     * @return the User
+     */
     private User getCurrentUser() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         User user = User.EMPTY();
         if (account != null) {
+            int id = (users != null) ? users.size()+1 : 1;
+            user.setId(id);
             user.setName(account.getDisplayName());
             user.setEmail(account.getEmail());
             if (account.getPhotoUrl() != null)
@@ -101,6 +131,9 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         return user;
     }
 
+    /**
+     * Signs the user out of their Google Sign In Account and returns to login activity.
+     */
     private void signOut() {
         Toast toast = Toast.makeText(getApplicationContext(), "Signing you out", Toast.LENGTH_LONG);
         toast.show();
@@ -115,6 +148,10 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         startActivity(mainIntent);
     }
 
+    /**
+     * Makes request with web service to retrieve user list data and handles response
+     * @param url web service url as a String
+     */
     private void getWebService(String url) {
         final Request request = new Request.Builder().url(url).build();
         client.newCall(request).enqueue(new Callback() {
@@ -147,6 +184,13 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         });
     }
 
+
+    /**
+     * Parses web service response data from Json to a List of Users,
+     * assigns each user a randomized avatar url,
+     * and sorts the List of Users based on name.
+     * @param data String containing Json response
+     */
     private void parseData(String data) {
         if (data != null) {
             Gson gson = new Gson();
@@ -165,6 +209,9 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Populates RecyclerView with User list
+     */
     private void populateRecycler() {
         Log.d(TAG, "Populating recycler view");
         UserAdapter.setOnItemClickListener(getOnClickListener());
@@ -172,6 +219,20 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getApplicationContext()));
     }
 
+    private void loadData() {
+        if (users.isEmpty()) {
+            Log.d(TAG, "Calling web service");
+            client = new OkHttpClient();
+            getWebService(getString(R.string.user_data_url));
+        } else {
+            populateRecycler();
+        }
+    }
+
+    /**
+     * Generates a randomized Robohash url to use as a User's avatar
+     * @return the randomized url as a String
+     */
     private String generateUrl() {
         final String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         SecureRandom rnd = new SecureRandom();
@@ -183,6 +244,24 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         return sb.toString();
     }
 
+    private void writeSharedPref() {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        Gson gson = new Gson();
+        String usersJson = gson.toJson(users);
+        editor.putString(USERS, usersJson);
+        editor.apply();
+    }
+
+    private void writeSharedPref(User user) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        Gson gson = new Gson();
+        String userJson = gson.toJson(user);
+        String usersJson = gson.toJson(users);
+        editor.putString(USER, userJson);
+        editor.putString(USERS, usersJson);
+        editor.apply();
+    }
+
     private UserAdapter.ClickListener getOnClickListener() {
         return new UserAdapter.ClickListener() {
             @Override
@@ -191,10 +270,11 @@ public class DisplayPeopleActivity extends AppCompatActivity {
                 Log.d(TAG, "Clicked " + user);
 
                 Intent userDetailIntent = new Intent(getApplicationContext(), UserDetailActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("user", user);
-                bundle.putParcelableArrayList("users", users);
-                userDetailIntent.putExtras(bundle);
+                // Bundle bundle = new Bundle();
+                // bundle.putParcelable(USER, user);
+                // bundle.putParcelableArrayList(USERS, users);
+                // userDetailIntent.putExtras(bundle);
+                writeSharedPref(user);
                 startActivity(userDetailIntent);
             }
         };

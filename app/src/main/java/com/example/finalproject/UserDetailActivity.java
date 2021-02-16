@@ -1,10 +1,13 @@
 package com.example.finalproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,13 +23,18 @@ import com.example.finalproject.model.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class UserDetailActivity extends AppCompatActivity {
     private static final String TAG = "UserDetailActivity";
+    private static final String USER = "user";
+    private static final String USERS = "users";
 
+    private SharedPreferences sharedPref;
     private ArrayList<User> users;
     private User user;
 
@@ -41,6 +49,28 @@ public class UserDetailActivity extends AppCompatActivity {
     private EditText phone;
     private EditText website;
     private EditText company;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        writeSharedPref();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Gson gson = new Gson();
+        String userJson = sharedPref.getString(USER, "");
+        String usersJson = sharedPref.getString(USERS, "");
+        if (!userJson.isEmpty()) {
+            user = gson.fromJson(userJson, User.class);
+            populateFields();
+        }
+        if (!usersJson.isEmpty()) {
+            User[] array = gson.fromJson(usersJson, User[].class);
+            users = new ArrayList<>(Arrays.asList(array));
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,26 +91,11 @@ public class UserDetailActivity extends AppCompatActivity {
         website = findViewById(R.id.website_field);
         company = findViewById(R.id.company_field);
 
-        Bundle bundle = getIntent().getExtras();
-        try {
-            user = bundle.getParcelable("user");
-            users = bundle.getParcelableArrayList("users");
-        } catch (NullPointerException e) {
-            user = User.EMPTY();
-            users = new ArrayList<>();
-        }
+        sharedPref = getApplicationContext().getSharedPreferences("FinalProject", Context.MODE_PRIVATE);
 
-        Picasso.get().load(user.getAvatarUrl()).into(avatar);
-        name.setText(user.getName());
-        username.setText(user.getUsername());
-        email.setText(user.getEmail());
-        street.setText(user.getAddress().getStreet());
-        suite.setText(user.getAddress().getSuite());
-        city.setText(user.getAddress().getCity());
-        zipcode.setText(user.getAddress().getZipcode());
-        phone.setText(user.getPhone());
-        website.setText(user.getWebsite());
-        company.setText(user.getCompany().toString());
+        // Bundle bundle = getIntent().getExtras();
+        // unpackBundle(bundle);
+        // populateFields();
     }
 
     @Override
@@ -109,16 +124,73 @@ public class UserDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
+        returnToListView();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        returnToListView();
+    }
+
+    private void returnToListView() {
         if (hasBeenChanged()) {
             Log.d(TAG, "Changes detected");
             promptToSave();
         } else {
             Log.d(TAG, "No changes. Returning to people list");
+            Intent returnIntent = new Intent(getApplicationContext(), DisplayPeopleActivity.class);
+            startActivity(returnIntent);
             finish();
         }
-        return true;
     }
 
+    private void writeSharedPref() {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        Gson gson = new Gson();
+        String userJson = gson.toJson(user);
+        String usersJson = gson.toJson(users);
+        editor.putString(USER, userJson);
+        editor.putString(USERS, usersJson);
+        editor.apply();
+    }
+
+    private void unpackBundle(Bundle bundle) {
+        if (bundle != null){
+            user = bundle.getParcelable(USER);
+            users = bundle.getParcelableArrayList(USERS);
+        }
+        if (user == null)
+            user = User.EMPTY();
+        if (users == null)
+            users = new ArrayList<>();
+    }
+
+    /**
+     * Fills text fields and loads avatar image from User data
+     */
+    private void populateFields() {
+        if (user != null)
+            Log.d(TAG, "Populating with user data: " + user.toString());
+        else
+            Log.d(TAG, "No user data to populate");
+        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty())
+            Picasso.get().load(user.getAvatarUrl()).into(avatar);
+        name.setText(user.getName());
+        username.setText(user.getUsername());
+        email.setText(user.getEmail());
+        street.setText(user.getAddress().getStreet());
+        suite.setText(user.getAddress().getSuite());
+        city.setText(user.getAddress().getCity());
+        zipcode.setText(user.getAddress().getZipcode());
+        phone.setText(user.getPhone());
+        website.setText(user.getWebsite());
+        company.setText(user.getCompany().toString());
+    }
+
+    /**
+     * Saves user inputted fields
+     */
     private void saveChanges() {
         int idx = users.indexOf(user);
 
@@ -142,6 +214,10 @@ public class UserDetailActivity extends AppCompatActivity {
         toast.show();
     }
 
+    /**
+     * Checks for any changes in any user input fields
+     * @return true if changes detected, else false
+     */
     private boolean hasBeenChanged() {
         return !(user.getUsername().equals(username.getText().toString())
                 && user.getEmail().equals(email.getText().toString())
@@ -154,30 +230,37 @@ public class UserDetailActivity extends AppCompatActivity {
                 && user.getCompany().getName().equals(company.getText().toString()));
     }
 
+
+    /**
+     * Displays alert dialog prompting the user to save their changes.
+     * User can select "Yes", "No", or "Cancel"
+     * Yes: saves changes and returns to DisplayPeopleActivity
+     * No: discards changes and returns to DisplayPeopleActivity
+     * Cancel: dismisses dialog and allows user to stay on UserDetailActivity
+     */
     private void promptToSave() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.save_dialog_prompt)
                 .setTitle(R.string.save_dialog_title);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked Yes button
+                // User selected Yes button
                 saveChanges();
-
-                Intent saveAndReturnIntent = new Intent(getApplicationContext(), DisplayPeopleActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("users", users);
-                saveAndReturnIntent.putExtras(bundle);
-                startActivity(saveAndReturnIntent);
+                Intent returnIntent = new Intent(getApplicationContext(), DisplayPeopleActivity.class);
+                startActivity(returnIntent);
+                finish();
             }
         });
         builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
+                // User selected Cancel, so just dismiss the dialog
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked No button
+                // User selected No button
+                Intent returnIntent = new Intent(getApplicationContext(), DisplayPeopleActivity.class);
+                startActivity(returnIntent);
                 finish();
             }
         });
@@ -185,6 +268,10 @@ public class UserDetailActivity extends AppCompatActivity {
         dialog.show();
     }
 
+
+    /**
+     * Signs the user out of their Google Sign In Account and returns to login activity.
+     */
     private void signOut() {
         Toast toast = Toast.makeText(getApplicationContext(), "Signing you out", Toast.LENGTH_LONG);
         toast.show();
