@@ -1,6 +1,5 @@
 package com.example.finalproject;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -92,10 +91,6 @@ public class UserDetailActivity extends AppCompatActivity {
         company = findViewById(R.id.company_field);
 
         sharedPref = getApplicationContext().getSharedPreferences("FinalProject", Context.MODE_PRIVATE);
-
-        // Bundle bundle = getIntent().getExtras();
-        // unpackBundle(bundle);
-        // populateFields();
     }
 
     @Override
@@ -153,17 +148,6 @@ public class UserDetailActivity extends AppCompatActivity {
         editor.putString(USER, userJson);
         editor.putString(USERS, usersJson);
         editor.apply();
-    }
-
-    private void unpackBundle(Bundle bundle) {
-        if (bundle != null){
-            user = bundle.getParcelable(USER);
-            users = bundle.getParcelableArrayList(USERS);
-        }
-        if (user == null)
-            user = User.EMPTY();
-        if (users == null)
-            users = new ArrayList<>();
     }
 
     /**

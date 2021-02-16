@@ -1,6 +1,5 @@
 package com.example.finalproject;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -75,10 +74,6 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         currentUser = getCurrentUser();
         recyclerView = findViewById(R.id.user_recycler);
         sharedPref = getApplicationContext().getSharedPreferences("FinalProject", Context.MODE_PRIVATE);
-
-        // Bundle bundle = getIntent().getExtras();
-        // unpackBundle(bundle);
-        // loadData();
     }
 
     @Override
@@ -103,14 +98,6 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void unpackBundle(Bundle bundle) {
-        if (bundle != null){
-            users = bundle.getParcelableArrayList(USERS);
-        }
-        if (users == null)
-            users = new ArrayList<>();
     }
 
     /**
@@ -270,10 +257,6 @@ public class DisplayPeopleActivity extends AppCompatActivity {
                 Log.d(TAG, "Clicked " + user);
 
                 Intent userDetailIntent = new Intent(getApplicationContext(), UserDetailActivity.class);
-                // Bundle bundle = new Bundle();
-                // bundle.putParcelable(USER, user);
-                // bundle.putParcelableArrayList(USERS, users);
-                // userDetailIntent.putExtras(bundle);
                 writeSharedPref(user);
                 startActivity(userDetailIntent);
             }

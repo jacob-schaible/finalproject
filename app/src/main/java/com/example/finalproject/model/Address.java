@@ -1,9 +1,6 @@
 package com.example.finalproject.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-public class Address implements Parcelable {
+public class Address {
     private String street;
     private String suite;
     private String city;
@@ -65,41 +62,6 @@ public class Address implements Parcelable {
     public String toString() {
         return street + " " + suite + "\n" + city + " " + zipcode;
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(street);
-        dest.writeString(suite);
-        dest.writeString(city);
-        dest.writeString(zipcode);
-        dest.writeParcelable(geo, 2);
-    }
-
-    protected Address(Parcel in) {
-        street = in.readString();
-        suite = in.readString();
-        city = in.readString();
-        zipcode = in.readString();
-        geo = in.readParcelable(Geo.class.getClassLoader());
-    }
-
-    public static final Creator<Address> CREATOR = new Creator<Address>() {
-        @Override
-        public Address createFromParcel(Parcel in) {
-            return new Address(in);
-        }
-
-        @Override
-        public Address[] newArray(int size) {
-            return new Address[size];
-        }
-    };
-
     public static Address EMPTY() {
         return new Address("", "", "", "", Geo.EMPTY());
     }

@@ -1,12 +1,9 @@
 package com.example.finalproject.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.util.Locale;
 import java.util.Objects;
 
-public class User implements Comparable<User>, Parcelable {
+public class User implements Comparable<User> {
 
     private int id;
     private String name;
@@ -143,48 +140,6 @@ public class User implements Comparable<User>, Parcelable {
     public int hashCode() {
         return Objects.hash(id, name);
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(name);
-        dest.writeString(username);
-        dest.writeString(email);
-        dest.writeParcelable(address, 6);
-        dest.writeString(phone);
-        dest.writeString(website);
-        dest.writeParcelable(company, 3);
-        dest.writeString(avatarUrl);
-    }
-
-    protected User(Parcel in) {
-        id = in.readInt();
-        name = in.readString();
-        username = in.readString();
-        email = in.readString();
-        address = in.readParcelable(Address.class.getClassLoader());
-        phone = in.readString();
-        website = in.readString();
-        company = in.readParcelable(Company.class.getClassLoader());
-        avatarUrl = in.readString();
-    }
-
-    public static final Creator<User> CREATOR = new Creator<User>() {
-        @Override
-        public User createFromParcel(Parcel in) {
-            return new User(in);
-        }
-
-        @Override
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
 
     public static User EMPTY() {
         return new User(0, "", "", "", Address.EMPTY(), "", "", Company.EMPTY(), "");
