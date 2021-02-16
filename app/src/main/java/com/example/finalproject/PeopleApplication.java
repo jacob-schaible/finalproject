@@ -49,7 +49,7 @@ public class PeopleApplication extends Application implements Application.Activi
             mainActivityVisible = true;
         else if (activity instanceof DisplayPeopleActivity)
             displayActivityVisible = true;
-        else if (activity instanceof UserDetailActivity)
+        else if (activity instanceof PersonDetailActivity)
             detailActivityVisible = true;
     }
 
@@ -60,7 +60,7 @@ public class PeopleApplication extends Application implements Application.Activi
             mainActivityVisible = true;
         else if (activity instanceof DisplayPeopleActivity)
             displayActivityVisible = true;
-        else if (activity instanceof UserDetailActivity)
+        else if (activity instanceof PersonDetailActivity)
             detailActivityVisible = true;
     }
 
@@ -71,7 +71,7 @@ public class PeopleApplication extends Application implements Application.Activi
             mainActivityVisible = true;
         else if (activity instanceof DisplayPeopleActivity)
             displayActivityVisible = true;
-        else if (activity instanceof UserDetailActivity)
+        else if (activity instanceof PersonDetailActivity)
             detailActivityVisible = true;
     }
 
@@ -82,7 +82,7 @@ public class PeopleApplication extends Application implements Application.Activi
             mainActivityVisible = false;
         else if (activity instanceof DisplayPeopleActivity)
             displayActivityVisible = false;
-        else if (activity instanceof UserDetailActivity)
+        else if (activity instanceof PersonDetailActivity)
             detailActivityVisible = false;
     }
 
@@ -93,7 +93,7 @@ public class PeopleApplication extends Application implements Application.Activi
             mainActivityVisible = false;
         else if (activity instanceof DisplayPeopleActivity)
             displayActivityVisible = false;
-        else if (activity instanceof UserDetailActivity)
+        else if (activity instanceof PersonDetailActivity)
             detailActivityVisible = false;
 
         // Displays a notification when leaving the app
@@ -114,7 +114,7 @@ public class PeopleApplication extends Application implements Application.Activi
             mainActivityVisible = false;
         else if (activity instanceof DisplayPeopleActivity)
             displayActivityVisible = false;
-        else if (activity instanceof UserDetailActivity)
+        else if (activity instanceof PersonDetailActivity)
             detailActivityVisible = false;
     }
 

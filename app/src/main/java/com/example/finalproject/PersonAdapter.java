@@ -9,16 +9,16 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.finalproject.model.User;
+import com.example.finalproject.model.Person;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
+public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.ViewHolder> {
     private static final String TAG = "UserAdapter";
     private static ClickListener clickListener;
 
-    private List<User> localDataSet;
+    private List<Person> localDataSet;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -47,10 +47,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     /**
      * Initialize the dataset of the Adapter.
      *
-     * @param dataSet List<User> containing the data to populate views to be used
+     * @param dataSet List<Person> containing the data to populate views to be used
      * by RecyclerView.
      */
-    public UserAdapter(List<User> dataSet) { localDataSet = dataSet; }
+    public PersonAdapter(List<Person> dataSet) { localDataSet = dataSet; }
 
     // Create new views (invoked by the layout manager)
     @Override
@@ -68,10 +68,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         Log.d(TAG, "Element " + position + " set.");
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        User user = localDataSet.get(position);
-        viewHolder.getRowTextView().setText(user.getName());
-        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty())
-            Picasso.get().load(user.getAvatarUrl()).into(viewHolder.getRowThumbnail());
+        Person person = localDataSet.get(position);
+        viewHolder.getRowTextView().setText(person.getName());
+        if (person.getAvatarUrl() != null && !person.getAvatarUrl().isEmpty())
+            Picasso.get().load(person.getAvatarUrl()).into(viewHolder.getRowThumbnail());
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -81,7 +81,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     }
 
     public static void setOnItemClickListener(ClickListener clickListener) {
-        UserAdapter.clickListener = clickListener;
+        PersonAdapter.clickListener = clickListener;
     }
 
     public interface ClickListener {

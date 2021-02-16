@@ -3,12 +3,12 @@
     <string name="greeting_text">Greetings</string>
     <string name="row_placeholder">John Doe</string>
 
-    <string name="user_data_url">https://jsonplaceholder.typicode.com/users</string>
+    <string name="people_data_url">https://jsonplaceholder.typicode.com/users</string>
     <string name="people_list_fragment_label">People</string>
-    <string name="user_detail_fragment_label">Details</string>
+    <string name="person_detail_fragment_label">Details</string>
     <string name="menu_item_sign_out">Sign out</string>
 
-    <string name="avatar_description">This user\'s profile image</string>
+    <string name="avatar_description">This person\'s profile image</string>
     <string name="name_placeholder">John Doe</string>
 
     <string name="username_hint">Enter a username</string>

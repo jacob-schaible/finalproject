@@ -12,8 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalProject">
-        <activity android:name=".UserDetailActivity" />
-        <activity android:name=".DisplayPeopleActivity" />
+        <activity android:name=".PersonDetailActivity" />
+        <activity
+            android:name=".DisplayPeopleActivity"
+            android:launchMode="singleTask" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"

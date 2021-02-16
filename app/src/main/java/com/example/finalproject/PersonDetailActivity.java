@@ -18,8 +18,9 @@ import android.widget.Toast;
 
 import com.example.finalproject.model.Address;
 import com.example.finalproject.model.Company;
-import com.example.finalproject.model.User;
+import com.example.finalproject.model.Person;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.gson.Gson;
@@ -28,14 +29,14 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class UserDetailActivity extends AppCompatActivity {
+public class PersonDetailActivity extends AppCompatActivity {
     private static final String TAG = "UserDetailActivity";
-    private static final String USER = "user";
-    private static final String USERS = "users";
+    private static final String PERSON = "person";
+    private static final String PEOPLE = "people";
 
     private SharedPreferences sharedPref;
-    private ArrayList<User> users;
-    private User user;
+    private ArrayList<Person> people;
+    private Person person;
 
     private ImageView avatar;
     private TextView name;
@@ -59,22 +60,22 @@ public class UserDetailActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Gson gson = new Gson();
-        String userJson = sharedPref.getString(USER, "");
-        String usersJson = sharedPref.getString(USERS, "");
-        if (!userJson.isEmpty()) {
-            user = gson.fromJson(userJson, User.class);
+        String personJson = sharedPref.getString(PERSON, "");
+        String peopleJson = sharedPref.getString(PEOPLE, "");
+        if (!personJson.isEmpty()) {
+            person = gson.fromJson(personJson, Person.class);
             populateFields();
         }
-        if (!usersJson.isEmpty()) {
-            User[] array = gson.fromJson(usersJson, User[].class);
-            users = new ArrayList<>(Arrays.asList(array));
+        if (!peopleJson.isEmpty()) {
+            Person[] array = gson.fromJson(peopleJson, Person[].class);
+            people = new ArrayList<>(Arrays.asList(array));
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_detail);
+        setContentView(R.layout.activity_person_detail);
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -143,56 +144,56 @@ public class UserDetailActivity extends AppCompatActivity {
     private void writeSharedPref() {
         SharedPreferences.Editor editor = sharedPref.edit();
         Gson gson = new Gson();
-        String userJson = gson.toJson(user);
-        String usersJson = gson.toJson(users);
-        editor.putString(USER, userJson);
-        editor.putString(USERS, usersJson);
+        String personJson = gson.toJson(person);
+        String peopleJson = gson.toJson(people);
+        editor.putString(PERSON, personJson);
+        editor.putString(PEOPLE, peopleJson);
         editor.apply();
     }
 
     /**
-     * Fills text fields and loads avatar image from User data
+     * Fills text fields and loads avatar image from Person data
      */
     private void populateFields() {
-        if (user != null)
-            Log.d(TAG, "Populating with user data: " + user.toString());
+        if (person != null)
+            Log.d(TAG, "Populating with person data: " + person.toString());
         else
-            Log.d(TAG, "No user data to populate");
-        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty())
-            Picasso.get().load(user.getAvatarUrl()).into(avatar);
-        name.setText(user.getName());
-        username.setText(user.getUsername());
-        email.setText(user.getEmail());
-        street.setText(user.getAddress().getStreet());
-        suite.setText(user.getAddress().getSuite());
-        city.setText(user.getAddress().getCity());
-        zipcode.setText(user.getAddress().getZipcode());
-        phone.setText(user.getPhone());
-        website.setText(user.getWebsite());
-        company.setText(user.getCompany().toString());
+            Log.d(TAG, "No person data to populate");
+        if (person.getAvatarUrl() != null && !person.getAvatarUrl().isEmpty())
+            Picasso.get().load(person.getAvatarUrl()).into(avatar);
+        name.setText(person.getName());
+        username.setText(person.getUsername());
+        email.setText(person.getEmail());
+        street.setText(person.getAddress().getStreet());
+        suite.setText(person.getAddress().getSuite());
+        city.setText(person.getAddress().getCity());
+        zipcode.setText(person.getAddress().getZipcode());
+        phone.setText(person.getPhone());
+        website.setText(person.getWebsite());
+        company.setText(person.getCompany().toString());
     }
 
     /**
      * Saves user inputted fields
      */
     private void saveChanges() {
-        int idx = users.indexOf(user);
+        int idx = people.indexOf(person);
 
-        user.setUsername(username.getText().toString());
-        user.setEmail(email.getText().toString());
+        person.setUsername(username.getText().toString());
+        person.setEmail(email.getText().toString());
         Address newAddress = new Address();
         newAddress.setStreet(street.getText().toString());
         newAddress.setSuite(suite.getText().toString());
         newAddress.setCity(city.getText().toString());
         newAddress.setZipcode(zipcode.getText().toString());
-        user.setAddress(newAddress);
-        user.setPhone(phone.getText().toString());
-        user.setWebsite(website.getText().toString());
+        person.setAddress(newAddress);
+        person.setPhone(phone.getText().toString());
+        person.setWebsite(website.getText().toString());
         Company newCompany = new Company();
         newCompany.setName(company.getText().toString());
-        user.setCompany(newCompany);
+        person.setCompany(newCompany);
 
-        users.set(idx, user);
+        people.set(idx, person);
 
         Toast toast = Toast.makeText(getApplicationContext(), "Changes have been saved", Toast.LENGTH_LONG);
         toast.show();
@@ -203,15 +204,15 @@ public class UserDetailActivity extends AppCompatActivity {
      * @return true if changes detected, else false
      */
     private boolean hasBeenChanged() {
-        return !(user.getUsername().equals(username.getText().toString())
-                && user.getEmail().equals(email.getText().toString())
-                && user.getAddress().getStreet().equals(street.getText().toString())
-                && user.getAddress().getSuite().equals(suite.getText().toString())
-                && user.getAddress().getCity().equals(city.getText().toString())
-                && user.getAddress().getZipcode().equals(zipcode.getText().toString())
-                && user.getPhone().equals(phone.getText().toString())
-                && user.getWebsite().equals(website.getText().toString())
-                && user.getCompany().getName().equals(company.getText().toString()));
+        return !(person.getUsername().equals(username.getText().toString())
+                && person.getEmail().equals(email.getText().toString())
+                && person.getAddress().getStreet().equals(street.getText().toString())
+                && person.getAddress().getSuite().equals(suite.getText().toString())
+                && person.getAddress().getCity().equals(city.getText().toString())
+                && person.getAddress().getZipcode().equals(zipcode.getText().toString())
+                && person.getPhone().equals(phone.getText().toString())
+                && person.getWebsite().equals(website.getText().toString())
+                && person.getCompany().getName().equals(company.getText().toString()));
     }
 
 
@@ -252,6 +253,14 @@ public class UserDetailActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private void handleSignedOut(GoogleSignInAccount account) {
+        if (account == null) {
+            Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+            mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(mainIntent);
+            finish();
+        }
+    }
 
     /**
      * Signs the user out of their Google Sign In Account and returns to login activity.
@@ -266,7 +275,6 @@ public class UserDetailActivity extends AppCompatActivity {
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
         googleSignInClient.signOut();
 
-        Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(mainIntent);
+        handleSignedOut(GoogleSignIn.getLastSignedInAccount(getApplicationContext()));
     }
 }

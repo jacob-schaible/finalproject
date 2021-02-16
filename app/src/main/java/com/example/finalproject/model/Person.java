@@ -3,7 +3,7 @@ package com.example.finalproject.model;
 import java.util.Locale;
 import java.util.Objects;
 
-public class User implements Comparable<User> {
+public class Person implements Comparable<Person> {
 
     private int id;
     private String name;
@@ -15,11 +15,11 @@ public class User implements Comparable<User> {
     private Company company;
     private String avatarUrl;
 
-    public User() {
+    public Person() {
     }
 
-    public User(int id, String name, String username, String email, Address address,
-                String phone, String website, Company company) {
+    public Person(int id, String name, String username, String email, Address address,
+                  String phone, String website, Company company) {
         this.id = id;
         this.name = name;
         this.username = username;
@@ -31,8 +31,8 @@ public class User implements Comparable<User> {
         // No avatar url
     }
 
-    public User(int id, String name, String username, String email, Address address,
-                String phone, String website, Company company, String avatarUrl) {
+    public Person(int id, String name, String username, String email, Address address,
+                  String phone, String website, Company company, String avatarUrl) {
         this.id = id;
         this.name = name;
         this.username = username;
@@ -117,7 +117,7 @@ public class User implements Comparable<User> {
     }
 
     @Override
-    public int compareTo(User u) {
+    public int compareTo(Person u) {
         return name.equals(u.getName()) ? Integer.compare(id, u.getId()) : name.compareTo(u.getName());
     }
 
@@ -131,9 +131,9 @@ public class User implements Comparable<User> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id == user.id &&
-                name.equals(user.name);
+        Person person = (Person) o;
+        return id == person.id &&
+                name.equals(person.name);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class User implements Comparable<User> {
         return Objects.hash(id, name);
     }
 
-    public static User EMPTY() {
-        return new User(0, "", "", "", Address.EMPTY(), "", "", Company.EMPTY(), "");
+    public static Person EMPTY() {
+        return new Person(0, "", "", "", Address.EMPTY(), "", "", Company.EMPTY(), "");
     }
 }

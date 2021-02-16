@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.finalproject.model.User;
+import com.example.finalproject.model.Person;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -37,12 +37,12 @@ import okhttp3.Response;
 
 public class DisplayPeopleActivity extends AppCompatActivity {
     private final String TAG = "DisplayPeopleActivity";
-    private static final String USER = "user";
-    private static final String USERS = "users";
+    private static final String PERSON = "person";
+    private static final String PEOPLE = "people";
 
     private SharedPreferences sharedPref;
-    private User currentUser;
-    private ArrayList<User> users;
+    private Person userPerson;
+    private ArrayList<Person> people;
     private OkHttpClient client;
     private RecyclerView recyclerView;
 
@@ -56,12 +56,12 @@ public class DisplayPeopleActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Gson gson = new Gson();
-        String usersJson = sharedPref.getString(USERS, "");
-        if (!usersJson.isEmpty()) {
-            User[] array = gson.fromJson(usersJson, User[].class);
-            users = new ArrayList<>(Arrays.asList(array));
+        String peopleJson = sharedPref.getString(PEOPLE, "");
+        if (!peopleJson.isEmpty()) {
+            Person[] array = gson.fromJson(peopleJson, Person[].class);
+            people = new ArrayList<>(Arrays.asList(array));
         } else {
-            users = new ArrayList<>();
+            people = new ArrayList<>();
         }
         loadData();
     }
@@ -71,8 +71,9 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_people);
 
-        currentUser = getCurrentUser();
-        recyclerView = findViewById(R.id.user_recycler);
+        handleSignedOut(GoogleSignIn.getLastSignedInAccount(getApplicationContext()));
+
+        recyclerView = findViewById(R.id.people_recycler);
         sharedPref = getApplicationContext().getSharedPreferences("FinalProject", Context.MODE_PRIVATE);
     }
 
@@ -101,25 +102,34 @@ public class DisplayPeopleActivity extends AppCompatActivity {
     }
 
     /**
-     * Generates a User object from GoogleSignInAccount
-     * @return the User
+     * Generates a Person object from the GoogleSignInAccount user
+     * @return the Peron
      */
-    private User getCurrentUser() {
+    private Person getUserPerson() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
-        User user = User.EMPTY();
+        Person person = Person.EMPTY();
         if (account != null) {
-            int id = (users != null) ? users.size()+1 : 1;
-            user.setId(id);
-            user.setName(account.getDisplayName());
-            user.setEmail(account.getEmail());
+            int id = (people != null) ? people.size()+1 : 1;
+            person.setId(id);
+            person.setName(account.getDisplayName());
+            person.setEmail(account.getEmail());
             if (account.getPhotoUrl() != null)
-                user.setAvatarUrl(account.getPhotoUrl().toString());
+                person.setAvatarUrl(account.getPhotoUrl().toString());
         }
-        return user;
+        return person;
+    }
+
+    private void handleSignedOut(GoogleSignInAccount account) {
+        if (account == null) {
+            Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
+            mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(mainIntent);
+            finish();
+        }
     }
 
     /**
-     * Signs the user out of their Google Sign In Account and returns to login activity.
+     * Signs the user out of their GoogleSignInAccount and returns to login activity.
      */
     private void signOut() {
         Toast toast = Toast.makeText(getApplicationContext(), "Signing you out", Toast.LENGTH_LONG);
@@ -131,12 +141,11 @@ public class DisplayPeopleActivity extends AppCompatActivity {
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
         googleSignInClient.signOut();
 
-        Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(mainIntent);
+        handleSignedOut(GoogleSignIn.getLastSignedInAccount(getApplicationContext()));
     }
 
     /**
-     * Makes request with web service to retrieve user list data and handles response
+     * Makes request with web service to retrieve people list data and handles response
      * @param url web service url as a String
      */
     private void getWebService(String url) {
@@ -173,23 +182,24 @@ public class DisplayPeopleActivity extends AppCompatActivity {
 
 
     /**
-     * Parses web service response data from Json to a List of Users,
-     * assigns each user a randomized avatar url,
-     * and sorts the List of Users based on name.
+     * Parses web service response data from Json to a List of people,
+     * assigns each person a randomized avatar url,
+     * and sorts the List of people based on name.
      * @param data String containing Json response
      */
     private void parseData(String data) {
         if (data != null) {
             Gson gson = new Gson();
-            User[] array = gson.fromJson(data, User[].class);
-            users = new ArrayList<>(Arrays.asList(array));
-            users.add(currentUser);
-            for (User u : users) {
-                if (u.getAvatarUrl() == null || u.getAvatarUrl().isEmpty())
-                    u.setAvatarUrl(generateUrl());
+            Person[] array = gson.fromJson(data, Person[].class);
+            people = new ArrayList<>(Arrays.asList(array));
+            userPerson = getUserPerson();
+            people.add(userPerson);
+            for (Person p : people) {
+                if (p.getAvatarUrl() == null || p.getAvatarUrl().isEmpty())
+                    p.setAvatarUrl(generateUrl());
             }
-            Collections.sort(users);
-            Log.d(TAG, "Parsing " + users.size() + " users");
+            Collections.sort(people);
+            Log.d(TAG, "Parsing " + people.size() + " people");
 
         } else {
             Log.d(TAG, "No data to parse");
@@ -197,27 +207,27 @@ public class DisplayPeopleActivity extends AppCompatActivity {
     }
 
     /**
-     * Populates RecyclerView with User list
+     * Populates RecyclerView with Person list
      */
     private void populateRecycler() {
         Log.d(TAG, "Populating recycler view");
-        UserAdapter.setOnItemClickListener(getOnClickListener());
-        recyclerView.setAdapter(new UserAdapter(users));
+        PersonAdapter.setOnItemClickListener(getOnClickListener());
+        recyclerView.setAdapter(new PersonAdapter(people));
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getApplicationContext()));
     }
 
     private void loadData() {
-        if (users.isEmpty()) {
+        if (people.isEmpty()) {
             Log.d(TAG, "Calling web service");
             client = new OkHttpClient();
-            getWebService(getString(R.string.user_data_url));
+            getWebService(getString(R.string.people_data_url));
         } else {
             populateRecycler();
         }
     }
 
     /**
-     * Generates a randomized Robohash url to use as a User's avatar
+     * Generates a randomized Robohash url to use as a Person's avatar
      * @return the randomized url as a String
      */
     private String generateUrl() {
@@ -234,31 +244,31 @@ public class DisplayPeopleActivity extends AppCompatActivity {
     private void writeSharedPref() {
         SharedPreferences.Editor editor = sharedPref.edit();
         Gson gson = new Gson();
-        String usersJson = gson.toJson(users);
-        editor.putString(USERS, usersJson);
+        String peopleJson = gson.toJson(people);
+        editor.putString(PEOPLE, peopleJson);
         editor.apply();
     }
 
-    private void writeSharedPref(User user) {
+    private void writeSharedPref(Person person) {
         SharedPreferences.Editor editor = sharedPref.edit();
         Gson gson = new Gson();
-        String userJson = gson.toJson(user);
-        String usersJson = gson.toJson(users);
-        editor.putString(USER, userJson);
-        editor.putString(USERS, usersJson);
+        String personJson = gson.toJson(person);
+        String peopleJson = gson.toJson(people);
+        editor.putString(PERSON, personJson);
+        editor.putString(PEOPLE, peopleJson);
         editor.apply();
     }
 
-    private UserAdapter.ClickListener getOnClickListener() {
-        return new UserAdapter.ClickListener() {
+    private PersonAdapter.ClickListener getOnClickListener() {
+        return new PersonAdapter.ClickListener() {
             @Override
             public void onItemClick(int position, View view) {
-                User user = users.get(position);
-                Log.d(TAG, "Clicked " + user);
+                Person person = people.get(position);
+                Log.d(TAG, "Clicked " + person);
 
-                Intent userDetailIntent = new Intent(getApplicationContext(), UserDetailActivity.class);
-                writeSharedPref(user);
-                startActivity(userDetailIntent);
+                Intent personDetailIntent = new Intent(getApplicationContext(), PersonDetailActivity.class);
+                writeSharedPref(person);
+                startActivity(personDetailIntent);
             }
         };
     }
