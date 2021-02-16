@@ -186,12 +186,6 @@ public class User implements Comparable<User>, Parcelable {
         }
     };
 
-    public static User DEFAULT() {
-        return new User(1, "Jen Brown", "jbrown90", "jen@groupr.com",
-                Address.DEFAULT(), "456-789-0123", "https://www.groupr.com",
-                Company.DEFAULT(), "https://robohash.org/jen");
-    }
-
     public static User EMPTY() {
         return new User(0, "", "", "", Address.EMPTY(), "", "", Company.EMPTY(), "");
     }

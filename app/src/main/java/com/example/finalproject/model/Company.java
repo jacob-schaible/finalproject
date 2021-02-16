@@ -76,9 +76,5 @@ public class Company implements Parcelable {
         }
     };
 
-    public static Company DEFAULT() {
-        return new Company("Seattle Space Needle", "clearly awe-inspiring", "The Space Needle is safely open with limited capacity and industry-leading Elevating Clean standards.");
-    }
-
     public static Company EMPTY() { return new Company("", "", ""); }
 }

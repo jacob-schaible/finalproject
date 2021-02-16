@@ -100,10 +100,6 @@ public class Address implements Parcelable {
         }
     };
 
-    public static Address DEFAULT() {
-        return new Address("400 Broad St", "", "Seattle, WA", "98109", Geo.DEFAULT());
-    }
-
     public static Address EMPTY() {
         return new Address("", "", "", "", Geo.EMPTY());
     }

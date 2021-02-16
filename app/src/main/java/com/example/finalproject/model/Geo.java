@@ -64,9 +64,5 @@ public class Geo implements Parcelable {
         }
     };
 
-    public static Geo DEFAULT() {
-        return new Geo("47.6179615", "-122.3491739");
-    }
-
     public static Geo EMPTY() { return new Geo("", ""); }
 }
