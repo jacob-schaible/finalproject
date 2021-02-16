@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -94,8 +96,9 @@ public class PeopleApplication extends Application implements Application.Activi
         else if (activity instanceof UserDetailActivity)
             detailActivityVisible = false;
 
+        // Displays a notification when leaving the app
         if (!(mainActivityVisible || displayActivityVisible || detailActivityVisible)) {
-            createNotification();
+            createNotification(activity);
         }
     }
 
@@ -131,11 +134,17 @@ public class PeopleApplication extends Application implements Application.Activi
         }
     }
 
-    public void createNotification() {
+    public void createNotification(Activity activity) {
+        Intent intent = new Intent(this, activity.getClass());
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(getString(R.string.notification_title))
-            .setContentText(getString(R.string.notification_message));
+            .setContentText(getString(R.string.notification_message))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(1, builder.build());
     }

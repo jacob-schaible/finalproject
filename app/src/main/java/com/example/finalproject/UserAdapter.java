@@ -70,7 +70,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         // contents of the view with that element
         User user = localDataSet.get(position);
         viewHolder.getRowTextView().setText(user.getName());
-        Picasso.get().load(user.getAvatarUrl()).into(viewHolder.getRowThumbnail());
+        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty())
+            Picasso.get().load(user.getAvatarUrl()).into(viewHolder.getRowThumbnail());
     }
 
     // Return the size of your dataset (invoked by the layout manager)
