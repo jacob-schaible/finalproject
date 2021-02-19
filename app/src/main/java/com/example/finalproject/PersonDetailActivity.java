@@ -1,5 +1,6 @@
 package com.example.finalproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -51,25 +52,40 @@ public class PersonDetailActivity extends AppCompatActivity {
     private EditText company;
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        writeSharedPref();
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        // Store EditText field values in case user made a change without saving
+        savedInstanceState.putString("username", username.getText().toString());
+        savedInstanceState.putString("email", email.getText().toString());
+        savedInstanceState.putString("street", street.getText().toString());
+        savedInstanceState.putString("suite", suite.getText().toString());
+        savedInstanceState.putString("city", city.getText().toString());
+        savedInstanceState.putString("zipcode", zipcode.getText().toString());
+        savedInstanceState.putString("phone", phone.getText().toString());
+        savedInstanceState.putString("website", website.getText().toString());
+        savedInstanceState.putString("company", company.getText().toString());
+
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Gson gson = new Gson();
-        String personJson = sharedPref.getString(PERSON, "");
-        String peopleJson = sharedPref.getString(PEOPLE, "");
-        if (!personJson.isEmpty()) {
-            person = gson.fromJson(personJson, Person.class);
-            populateFields();
-        }
-        if (!peopleJson.isEmpty()) {
-            Person[] array = gson.fromJson(peopleJson, Person[].class);
-            people = new ArrayList<>(Arrays.asList(array));
-        }
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // Restore EditText field values in case user made a change without saving
+        username.setText(savedInstanceState.getString("username"));
+        email.setText(savedInstanceState.getString("email"));
+        street.setText(savedInstanceState.getString("street"));
+        suite.setText(savedInstanceState.getString("suite"));
+        city.setText(savedInstanceState.getString("city"));
+        zipcode.setText(savedInstanceState.getString("zipcode"));
+        phone.setText(savedInstanceState.getString("phone"));
+        website.setText(savedInstanceState.getString("website"));
+        company.setText(savedInstanceState.getString("company"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        writeSharedPref();
     }
 
     @Override
@@ -92,6 +108,17 @@ public class PersonDetailActivity extends AppCompatActivity {
         company = findViewById(R.id.company_field);
 
         sharedPref = getApplicationContext().getSharedPreferences("FinalProject", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String personJson = sharedPref.getString(PERSON, "");
+        String peopleJson = sharedPref.getString(PEOPLE, "");
+        if (!personJson.isEmpty()) {
+            person = gson.fromJson(personJson, Person.class);
+            populateFields();
+        }
+        if (!peopleJson.isEmpty()) {
+            Person[] array = gson.fromJson(peopleJson, Person[].class);
+            people = new ArrayList<>(Arrays.asList(array));
+        }
     }
 
     @Override
