@@ -71,15 +71,7 @@ public class PersonDetailActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         // Restore EditText field values in case user made a change without saving
-        username.setText(savedInstanceState.getString("username"));
-        email.setText(savedInstanceState.getString("email"));
-        street.setText(savedInstanceState.getString("street"));
-        suite.setText(savedInstanceState.getString("suite"));
-        city.setText(savedInstanceState.getString("city"));
-        zipcode.setText(savedInstanceState.getString("zipcode"));
-        phone.setText(savedInstanceState.getString("phone"));
-        website.setText(savedInstanceState.getString("website"));
-        company.setText(savedInstanceState.getString("company"));
+        populateFields(savedInstanceState);
     }
 
     @Override
@@ -92,6 +84,7 @@ public class PersonDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_detail);
+
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -113,11 +106,19 @@ public class PersonDetailActivity extends AppCompatActivity {
         String peopleJson = sharedPref.getString(PEOPLE, "");
         if (!personJson.isEmpty()) {
             person = gson.fromJson(personJson, Person.class);
-            populateFields();
+        } else {
+            person = Person.EMPTY();
         }
         if (!peopleJson.isEmpty()) {
             Person[] array = gson.fromJson(peopleJson, Person[].class);
             people = new ArrayList<>(Arrays.asList(array));
+        } else {
+            people = new ArrayList<>();
+        }
+        if (savedInstanceState != null) {
+            populateFields(savedInstanceState);
+        } else {
+            populateFields();
         }
     }
 
@@ -198,6 +199,22 @@ public class PersonDetailActivity extends AppCompatActivity {
         phone.setText(person.getPhone());
         website.setText(person.getWebsite());
         company.setText(person.getCompany().toString());
+    }
+
+    private void populateFields(Bundle savedInstanceState) {
+        Log.d(TAG, "Populating from savedInstanceState");
+        if (person.getAvatarUrl() != null && !person.getAvatarUrl().isEmpty())
+            Picasso.get().load(person.getAvatarUrl()).into(avatar);
+        name.setText(person.getName());
+        username.setText(savedInstanceState.getString("username"));
+        email.setText(savedInstanceState.getString("email"));
+        street.setText(savedInstanceState.getString("street"));
+        suite.setText(savedInstanceState.getString("suite"));
+        city.setText(savedInstanceState.getString("city"));
+        zipcode.setText(savedInstanceState.getString("zipcode"));
+        phone.setText(savedInstanceState.getString("phone"));
+        website.setText(savedInstanceState.getString("website"));
+        company.setText(savedInstanceState.getString("company"));
     }
 
     /**

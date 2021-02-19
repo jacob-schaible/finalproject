@@ -8,6 +8,8 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -96,10 +98,12 @@ public class PeopleApplication extends Application implements Application.Activi
         else if (activity instanceof PersonDetailActivity)
             detailActivityVisible = false;
 
-        // Displays a notification when leaving the app
-        if (!(mainActivityVisible || displayActivityVisible || detailActivityVisible)) {
-            createNotification(activity);
-        }
+        // Displays a notification when leaving the app after a brief delay
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (!(mainActivityVisible || displayActivityVisible || detailActivityVisible)) {
+                createNotification(activity);
+            }
+        }, 500);
     }
 
     @Override
