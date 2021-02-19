@@ -27,6 +27,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -52,25 +54,27 @@ public class PersonDetailActivity extends AppCompatActivity {
     private EditText company;
 
     @Override
-    protected void onSaveInstanceState(Bundle savedInstanceState) {
-        // Store EditText field values in case user made a change without saving
-        savedInstanceState.putString("username", username.getText().toString());
-        savedInstanceState.putString("email", email.getText().toString());
-        savedInstanceState.putString("street", street.getText().toString());
-        savedInstanceState.putString("suite", suite.getText().toString());
-        savedInstanceState.putString("city", city.getText().toString());
-        savedInstanceState.putString("zipcode", zipcode.getText().toString());
-        savedInstanceState.putString("phone", phone.getText().toString());
-        savedInstanceState.putString("website", website.getText().toString());
-        savedInstanceState.putString("company", company.getText().toString());
-
+    protected void onSaveInstanceState(@NotNull Bundle savedInstanceState) {
+        // Store EditText field values if user made a change without saving
+        if (hasBeenChanged()) {
+            Log.d(TAG, "Changes detected");
+            savedInstanceState.putString("username", username.getText().toString());
+            savedInstanceState.putString("email", email.getText().toString());
+            savedInstanceState.putString("street", street.getText().toString());
+            savedInstanceState.putString("suite", suite.getText().toString());
+            savedInstanceState.putString("city", city.getText().toString());
+            savedInstanceState.putString("zipcode", zipcode.getText().toString());
+            savedInstanceState.putString("phone", phone.getText().toString());
+            savedInstanceState.putString("website", website.getText().toString());
+            savedInstanceState.putString("company", company.getText().toString());
+        }
         super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        // Restore EditText field values in case user made a change without saving
+        // Restore EditText field values if user made a change without saving
         populateFields(savedInstanceState);
     }
 
@@ -78,6 +82,12 @@ public class PersonDetailActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         writeSharedPref();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        readSharedPref();
     }
 
     @Override
@@ -101,20 +111,7 @@ public class PersonDetailActivity extends AppCompatActivity {
         company = findViewById(R.id.company_field);
 
         sharedPref = getApplicationContext().getSharedPreferences("FinalProject", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String personJson = sharedPref.getString(PERSON, "");
-        String peopleJson = sharedPref.getString(PEOPLE, "");
-        if (!personJson.isEmpty()) {
-            person = gson.fromJson(personJson, Person.class);
-        } else {
-            person = Person.EMPTY();
-        }
-        if (!peopleJson.isEmpty()) {
-            Person[] array = gson.fromJson(peopleJson, Person[].class);
-            people = new ArrayList<>(Arrays.asList(array));
-        } else {
-            people = new ArrayList<>();
-        }
+        readSharedPref();
         if (savedInstanceState != null) {
             populateFields(savedInstanceState);
         } else {
@@ -177,6 +174,23 @@ public class PersonDetailActivity extends AppCompatActivity {
         editor.putString(PERSON, personJson);
         editor.putString(PEOPLE, peopleJson);
         editor.apply();
+    }
+
+    private void readSharedPref() {
+        Gson gson = new Gson();
+        String personJson = sharedPref.getString(PERSON, "");
+        String peopleJson = sharedPref.getString(PEOPLE, "");
+        if (!personJson.isEmpty()) {
+            person = gson.fromJson(personJson, Person.class);
+        } else {
+            person = Person.EMPTY();
+        }
+        if (!peopleJson.isEmpty()) {
+            Person[] array = gson.fromJson(peopleJson, Person[].class);
+            people = new ArrayList<>(Arrays.asList(array));
+        } else {
+            people = new ArrayList<>();
+        }
     }
 
     /**
